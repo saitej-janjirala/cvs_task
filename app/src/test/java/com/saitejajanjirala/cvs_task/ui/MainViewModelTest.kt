@@ -60,14 +60,11 @@ class MainViewModelTest {
     fun `searchQuery triggers repository search`() = runTest {
         val mockItems = listOf(Item("Matery", "robertGreen", "2000", "media", "https://www.google.com/books/edition/Mastery/vkCKDQAAQBAJ?hl=en&gbpv=1&printsec=frontcover", Media("url"), "2012"))
         coEvery { repository.searchImages("test query") } returns flow{
-            delay(300)//debounce(300) inside the ViewModel only applies to the emissions from _searchQuery. It does not control the timing of the
-            // emissions from the Flow returned by repository.searchImages(query).
             emit(Result.Loading())
             emit(Result.Success(mockItems))
         }
 
         viewModel.updateSearchQuery("test query")
-        advanceTimeBy(300)
 
         viewModel.searchResults.test {
             val firstItem = awaitItem()
@@ -89,9 +86,7 @@ class MainViewModelTest {
 
         viewModel.updateSearchQuery("")
 
-        advanceTimeBy(300)
         viewModel.searchResults.test {
-            delay(300)
             assert(awaitItem() is Result.Idle)
             cancelAndIgnoreRemainingEvents()
         }
@@ -102,14 +97,12 @@ class MainViewModelTest {
         val msg = "Error occured during test"
         val q = "test query"
         coEvery { repository.searchImages(q) } returns flow {
-            delay(300)
             emit(Result.Loading<List<Item>>())
             emit(Result.Error<List<Item>>(msg))
         }
 
         viewModel.updateSearchQuery(q)
 
-        advanceTimeBy(300) // Simulate debounce delay
 
         viewModel.searchResults.test {
             val first = awaitItem()
