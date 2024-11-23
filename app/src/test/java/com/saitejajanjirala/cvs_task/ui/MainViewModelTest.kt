@@ -116,12 +116,5 @@ class MainViewModelTest {
         }
     }
 
-    @Test
-    fun `getItem retrieves item from SavedStateHandle`() {
-        val mockItem = Item("title", "description", "link", "media", "author", Media("url"), "published")
-        savedStateHandle["item"] = mockItem
 
-        val result = viewModel.getItem()
-        assertEquals(mockItem, result)
-    }
 }

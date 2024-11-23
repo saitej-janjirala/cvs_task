@@ -57,10 +57,6 @@ class MainViewModel  @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun getItem():Item? {
-        return savedStateHandle.get<Item>("item")
-    }
-
 
 
 }
