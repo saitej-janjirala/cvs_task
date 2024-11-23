@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -90,13 +91,14 @@ fun SharedTransitionScope.HomeScreen(
                 }
             }
             is Result.Success -> {   val items = result.d ?: emptyList()
+                val scrollState = rememberScrollState()
                 // Grid View of Images
                 LazyColumn (
-
                     modifier = Modifier.fillMaxSize(),
-
                 ) {
-                    items(items.size) { index ->
+                    items(items.size, key = {
+                        items.get(it).media!!.m!!
+                    }) { index ->
                         val item = items[index]
                         AsyncImageWithPlaceholder(item,modifier = Modifier.clickable {
                            onImageClicked(item)
@@ -109,7 +111,7 @@ fun SharedTransitionScope.HomeScreen(
                             boundsTransform = { _, _ ->
                                 tween(durationMillis = 1000)
                             }
-                        ))
+                        ),)
                         Spacer(Modifier.height(8.dp))
                     }
                 }

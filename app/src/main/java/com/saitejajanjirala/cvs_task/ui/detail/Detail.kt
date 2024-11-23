@@ -1,5 +1,6 @@
 package com.saitejajanjirala.cvs_task.ui.detail
 
+import android.graphics.Bitmap
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,6 +9,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +30,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -52,9 +60,14 @@ fun SharedTransitionScope.DetailScreen(
     item: Item,
     animatedVisibilityScope: AnimatedVisibilityScope,
     onBackClicked: () -> Unit,
+    onShareClicked:   (item: Item) -> Unit
 ){
-
-
+    var shareData by remember { mutableStateOf(false) }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    if(shareData){
+        onShareClicked(item)
+        shareData = false
+    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -79,7 +92,18 @@ fun SharedTransitionScope.DetailScreen(
                             contentDescription = "Go back"
                         )
                     }
-                },)
+                },
+                actions = {
+                    IconButton(onClick = {
+                        shareData = true
+                    }) {
+                        Icon(
+                            painterResource(id = android.R.drawable.ic_menu_share),
+                            contentDescription = "Share Image"
+                        )
+                    }
+                }
+                )
         },
     ) {
         Column(
