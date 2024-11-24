@@ -66,6 +66,7 @@ class MainViewModelTest {
 
         viewModel.updateSearchQuery("test query")
 
+
         viewModel.searchResults.test {
             val firstItem = awaitItem()
             assert(firstItem is Result.Idle)

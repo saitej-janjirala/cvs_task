@@ -9,6 +9,8 @@ import com.saitejajanjirala.cvs_task.domain.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,7 +39,7 @@ class MainViewModel  @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _searchQuery
+            searchQuery
                 .debounce(300)
                 .distinctUntilChanged()
                 .flatMapLatest { query ->
@@ -51,6 +54,9 @@ class MainViewModel  @Inject constructor(
                     _searchResults.value = result
                 }
         }
+
+
+
     }
 
     fun updateSearchQuery(query: String) {
