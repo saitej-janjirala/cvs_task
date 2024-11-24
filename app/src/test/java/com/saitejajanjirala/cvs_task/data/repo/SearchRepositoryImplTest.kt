@@ -48,7 +48,7 @@ class SearchRepositoryImplTest{
             assert(awaitItem() is Result.Loading)
             val result = awaitItem()
             assert(result is Result.Success && result.d == mockItems)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -76,7 +76,7 @@ class SearchRepositoryImplTest{
             assert(first is Result.Loading)
             val result = awaitItem()
             assert(result is Result.Error && result.m == m)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

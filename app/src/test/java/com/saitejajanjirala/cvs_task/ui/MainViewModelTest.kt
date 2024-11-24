@@ -97,8 +97,8 @@ class MainViewModelTest {
         val msg = "Error occured during test"
         val q = "test query"
         coEvery { repository.searchImages(q) } returns flow {
-            emit(Result.Loading<List<Item>>())
-            emit(Result.Error<List<Item>>(msg))
+            emit(Result.Loading())
+            emit(Result.Error(msg))
         }
 
         viewModel.updateSearchQuery(q)
