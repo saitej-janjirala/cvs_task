@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -71,9 +72,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Cvs_taskTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Spacer(modifier = Modifier.padding(innerPadding))
 
+                val snackbarHostState = remember { SnackbarHostState()}
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    Spacer(modifier = Modifier.padding(innerPadding))
                     NavGraph(navController = rememberNavController())
 
                 }
@@ -136,7 +140,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    fun urlToBitmap(
+    private fun urlToBitmap(
         scope: CoroutineScope,
         imageURL: String,
         context: Context,
@@ -171,12 +175,12 @@ class MainActivity : ComponentActivity() {
 
     private suspend fun shareBitmapWithMetadata(context: Context, bitmap: Bitmap, metadata: String) {
         val fileUri = withContext(Dispatchers.IO) {
-            val cacheDir = File(context.cacheDir, "images")
+            val cacheDir = File(context.cacheDir, "shared_images")
             cacheDir.mkdirs()
 
-            val file = File(cacheDir, "shared_image${System.currentTimeMillis()}.png")
+            val file = File(cacheDir, "image${System.currentTimeMillis()}.png")
             FileOutputStream(file).use { fos ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, fos)
             }
 
             FileProvider.getUriForFile(

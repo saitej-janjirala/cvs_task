@@ -23,6 +23,7 @@ android {
         }
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -93,8 +94,6 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
-
-
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.room.ktx)
 

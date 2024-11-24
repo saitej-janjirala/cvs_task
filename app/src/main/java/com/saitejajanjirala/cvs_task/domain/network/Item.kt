@@ -2,6 +2,8 @@ package com.saitejajanjirala.cvs_task.domain.network
 
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -20,11 +22,12 @@ data class Item(
     @Json(name = "link")
     val link: String? = null,
     @Json(name = "media")
-    val media: Media? = null,
+    val media: Media ?=null,
     @Json(name = "published")
     val published: String? = null,
     @Json(name = "tags")
     val tags: String? = null,
     @Json(name = "title")
-    val title: String? = null
+    val title: String? = null,
+
 ): Parcelable

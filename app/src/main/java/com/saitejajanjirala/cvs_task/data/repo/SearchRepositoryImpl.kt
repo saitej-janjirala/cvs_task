@@ -1,5 +1,6 @@
 package com.saitejajanjirala.cvs_task.data.repo
 
+import com.saitejajanjirala.cvs_task.data.db.SearchDao
 import com.saitejajanjirala.cvs_task.data.remote.ApiService
 import com.saitejajanjirala.cvs_task.di.NoInternetException
 import com.saitejajanjirala.cvs_task.domain.network.Item
@@ -11,16 +12,31 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
-class SearchRepositoryImpl @Inject constructor(private val apiService: ApiService): SearchRepository {
+class SearchRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val searchDao: SearchDao
+    ): SearchRepository {
     override suspend fun searchImages(query: String): Flow<Result<List<Item>>> = flow{
         emit(Result.Loading())
-        val res = apiService.searchImages(query)
-        if (res.isSuccessful) {
-            res.body()?.items?.let {
-                emit(Result.Success(it))
-            } ?: emit(Result.Error("No results found"))
-        } else {
-            emit(Result.Error(res.message()))
+        val cachedResult = searchDao.getSearchResult(query)
+        if(cachedResult?.items != null){
+            emit(Result.Success(cachedResult.items))
+        } else{
+            val res = apiService.searchImages(query)
+            if (res.isSuccessful) {
+                val searchResult = res.body()
+                if(searchResult!=null){
+                    searchDao.insertSearchResult(searchResult.copy(query = query))
+                    searchResult.items?.let {
+                            it -> emit(Result.Success(it))
+                    }?:emit(Result.Error("No results found"))
+                }
+                else{
+                    emit(Result.Error("No results found"))
+                }
+            } else {
+                emit(Result.Error(res.message()))
+            }
         }
     }.catch { e ->
         when (e) {

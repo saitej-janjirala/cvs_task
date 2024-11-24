@@ -2,6 +2,9 @@ package com.saitejajanjirala.cvs_task.di
 
 import android.app.Application
 import android.content.Context
+import androidx.room.Room
+import com.saitejajanjirala.cvs_task.data.db.DatabaseService
+import com.saitejajanjirala.cvs_task.data.db.SearchDao
 import com.saitejajanjirala.cvs_task.data.remote.ApiService
 import com.saitejajanjirala.cvs_task.util.Util
 
@@ -66,6 +69,21 @@ object AppModule{
             .client(okHttpClient)
             .build()
             .create(ApiService::class.java)
+    }
+
+
+    @Singleton
+    @Provides
+    fun providesDatabase(application: Application):DatabaseService{
+        return Room.databaseBuilder(application, DatabaseService::class.java,DatabaseService.DATABASE_NAME)
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun providesItemDao(databaseService: DatabaseService): SearchDao {
+        return databaseService.searchDao
     }
 
 }
