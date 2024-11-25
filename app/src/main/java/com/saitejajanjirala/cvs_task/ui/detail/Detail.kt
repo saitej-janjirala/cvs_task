@@ -1,15 +1,13 @@
 package com.saitejajanjirala.cvs_task.ui.detail
 
-import android.graphics.Bitmap
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.TextView
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -34,38 +31,39 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.saitejajanjirala.cvs_task.domain.network.Item
-import com.saitejajanjirala.cvs_task.ui.MainViewModel
 import com.saitejajanjirala.cvs_task.ui.util.AsyncImageWithPlaceholder
-import com.saitejajanjirala.cvs_task.ui.util.Screen
 import com.saitejajanjirala.cvs_task.util.Util
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SharedTransitionScope.DetailScreen(
-
     item: Item,
     animatedVisibilityScope: AnimatedVisibilityScope,
     onBackClicked: () -> Unit,
-    onShareClicked:   (item: Item) -> Unit
+    viewModel: DetailScreenViewModel = hiltViewModel()
 ){
+    LaunchedEffect(key1 = true){
+        viewModel.getUri(item.media!!.m!!)
+    }
+    val context = LocalContext.current
     var shareData by remember { mutableStateOf(false) }
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    if(shareData){
-        onShareClicked(item)
+    val uri : Uri? by viewModel.shareUri
+    LaunchedEffect (shareData){
+        val finalUri = uri
+        if(finalUri!=null && shareData){
+            shareData(context,item,finalUri)
+        }
         shareData = false
     }
     Scaffold(
@@ -159,7 +157,21 @@ fun SharedTransitionScope.DetailScreen(
     }
 }
 
-
+fun shareData(context: Context, item: Item, uri: Uri) {
+    val metadata = """
+                             Title: ${item.title}
+                              Description: ${item.description ?: "No description"}
+                              Author: ${item.author}
+                              Published: ${Util.formatPublishedDateLegacy(item.published!!)}
+                           """.trimIndent()
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/*"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_TEXT, metadata)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(shareIntent, "Share Image and Metadata"))
+}
 @Composable
 fun HtmlText(html: String, modifier: Modifier = Modifier) {
     AndroidView(
