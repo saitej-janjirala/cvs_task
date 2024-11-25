@@ -111,6 +111,7 @@ class MainActivity : ComponentActivity() {
                             scope.launch {
                                 shareBitmapWithMetadata(context, bitmap, metadata)
                             }
+                            sharedItem = null
                         }
                     },
                     onError = {
@@ -210,6 +211,8 @@ class MainActivity : ComponentActivity() {
             context.startActivity(Intent.createChooser(shareIntent, "Share Image and Metadata"))
         }
     }
+
+
 
 }
 
