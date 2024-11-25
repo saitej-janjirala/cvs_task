@@ -89,6 +89,36 @@ class MainActivity : ComponentActivity() {
     fun NavGraph(navController: NavHostController){
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
+        var sharedItem by remember { mutableStateOf<Item?>(null) }
+
+        LaunchedEffect(
+        key1 = sharedItem,
+        ) {
+            val item = sharedItem
+            if (item != null) {
+                urlToBitmap(
+                    scope,
+                    item.media!!.m!!,
+                    context,
+                    onSuccess = {b->
+                        b?.let { bitmap->
+                            val metadata = """
+                                                Title: ${item.title}
+                                                Description: ${item.description ?: "No description"}
+                                                Author: ${item.author}
+                                                Published: ${Util.formatPublishedDateLegacy(item.published!!)}
+                                            """.trimIndent()
+                            scope.launch {
+                                shareBitmapWithMetadata(context, bitmap, metadata)
+                            }
+                        }
+                    },
+                    onError = {
+
+                    },)
+            }
+        }
+
         SharedTransitionLayout {
             NavHost(navController, startDestination = Screen.HomeScreen.route) {
                 composable(Screen.HomeScreen.route) {
@@ -108,28 +138,7 @@ class MainActivity : ComponentActivity() {
                             navController.navigateUp()
                             },
                             onShareClicked = { item->
-                                urlToBitmap(
-                                    scope,
-                                    item.media!!.m!!,
-                                    context,
-                                    onSuccess = {b->
-                                        b?.let { bitmap->
-                                            val metadata = """
-                                                Title: ${item.title}
-                                                Description: ${item.description ?: "No description"}
-                                                Author: ${item.author}
-                                                Published: ${Util.formatPublishedDateLegacy(item.published!!)}
-                                            """.trimIndent()
-                                            scope.launch {
-                                                shareBitmapWithMetadata(context, bitmap, metadata)
-                                            }
-                                        }
-                                    },
-                                    onError = {
-
-                                    },
-                                )
-
+                                sharedItem = item
                             }
                         )
                     }

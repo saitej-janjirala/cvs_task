@@ -76,7 +76,6 @@ object AppModule{
     @Provides
     fun providesDatabase(application: Application):DatabaseService{
         return Room.databaseBuilder(application, DatabaseService::class.java,DatabaseService.DATABASE_NAME)
-            .fallbackToDestructiveMigration()
             .build()
     }
 

@@ -54,9 +54,6 @@ class MainViewModel  @Inject constructor(
                     _searchResults.value = result
                 }
         }
-
-
-
     }
 
     fun updateSearchQuery(query: String) {
