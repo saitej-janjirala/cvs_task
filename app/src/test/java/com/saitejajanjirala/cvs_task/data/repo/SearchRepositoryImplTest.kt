@@ -1,5 +1,7 @@
 package com.saitejajanjirala.cvs_task.data.repo
 
+import android.content.Context
+import android.graphics.Bitmap
 import app.cash.turbine.test
 import com.saitejajanjirala.cvs_task.data.db.SearchDao
 import com.saitejajanjirala.cvs_task.data.remote.ApiService
@@ -30,14 +32,16 @@ class SearchRepositoryImplTest{
     private lateinit var repository: SearchRepositoryImpl
     private lateinit var apiService: ApiService
     private lateinit var searchDao : SearchDao
+    private lateinit var context: Context
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp(){
         Dispatchers.setMain(testDispatcher)
+        context = mockk<Context>()
         apiService = mockk<ApiService>()
         searchDao = mockk<SearchDao>()
-        repository = SearchRepositoryImpl(apiService,searchDao)
+        repository = SearchRepositoryImpl(context,apiService,searchDao)
     }
 
     @Test
@@ -145,6 +149,8 @@ class SearchRepositoryImplTest{
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+
 
     @After
     fun tearDown(){
